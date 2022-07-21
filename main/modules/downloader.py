@@ -19,7 +19,7 @@ async def downloader(message: Message, link: str,total,name):
 
   r = message
   await r.edit('Downloading Metadata...')
-    
+
   while (not handle.has_metadata()):    
     await asyncio.sleep(1)
 
@@ -28,11 +28,11 @@ async def downloader(message: Message, link: str,total,name):
   trgt = str(handle.name())
 
   while (handle.status().state != lt.torrent_status.seeding):
-    
+
     s = handle.status()
-    
+
     state_str = ['queued', 'checking', 'downloading metadata', 'downloading', 'finished', 'seeding', 'allocating']
-    
+
     try:
       text = get_progress_text(
           name, 
@@ -48,5 +48,5 @@ async def downloader(message: Message, link: str,total,name):
       pass
 
     await asyncio.sleep(10)
-  
-  return "downloads/" + trgt
+
+  return f"downloads/{trgt}"

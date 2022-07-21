@@ -19,8 +19,7 @@ def parse():
     data = []    
 
     for i in b:
-        item = {}
-        item['title'] = trim_title(i['title'])
+        item = {'title': trim_title(i['title'])}
         item['size'] = i['subsplease_size']
         item['link'] = i['link']
         data.append(item)
@@ -39,19 +38,16 @@ async def auto_parser():
         data = await get_animesdb()
         uploaded = await get_uploads()
 
-        saved_anime = []
-        for i in data:
-            saved_anime.append(i["name"])
-
-        uanimes = []
-        for i in uploaded:
-            uanimes.append(i["name"])
-        
+        saved_anime = [i["name"] for i in data]
+        uanimes = [i["name"] for i in uploaded]
         for i in rss:
-            if i["title"] not in uanimes and i["title"] not in saved_anime:
-                if ".mkv" in i["title"] or ".mp4" in i["title"]:
-                    title = i["title"]
-                    await save_animedb(title,i)
+            if (
+                i["title"] not in uanimes
+                and i["title"] not in saved_anime
+                and (".mkv" in i["title"] or ".mp4" in i["title"])
+            ):
+                title = i["title"]
+                await save_animedb(title,i)
 
         data = await get_animesdb()
         for i in data:

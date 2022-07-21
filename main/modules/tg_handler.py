@@ -38,7 +38,7 @@ async def tg_handler():
                     except:
                         pass
                 await asyncio.sleep(600)
-                
+
         except FloodWait as e:
             flood_time = int(e.x) + 5
             try:
@@ -46,8 +46,6 @@ async def tg_handler():
             except:
                 pass
             await asyncio.sleep(flood_time)
-        except:
-            pass
             
 async def start_uploading(data):
     try:
@@ -56,8 +54,8 @@ async def start_uploading(data):
         size = data["size"]
 
         name, ext = title.split(".")
-        name += f" [@{UPLOADS_USERNAME}]." + ext
-        fpath = "downloads/" + name
+        name += f" [@{UPLOADS_USERNAME}].{ext}"
+        fpath = f"downloads/{name}"
         name = name.replace(f" [@{UPLOADS_USERNAME}].","").replace(ext,"").strip()
 
         id, img, tit = await get_anime_img(get_anime_name(title))
@@ -73,8 +71,8 @@ async def start_uploading(data):
         duration = get_duration(file)
         os.rename(file,"video.mkv")
         compressed = await compress_video(duration,msg,name)
-        
-        if compressed == "None" or compressed == None:
+
+        if compressed == "None" or compressed is None:
             print("Encoding Failed Uploading The Original File")
             os.rename("video.mkv",fpath)
         else:
@@ -91,7 +89,7 @@ async def start_uploading(data):
             os.remove(file)
             os.remove(fpath)
         except:
-            pass     
+            pass
     except FloodWait as e:
         flood_time = int(e.x) + 5
         try:
@@ -169,16 +167,15 @@ async def channel_handler(msg_id,id,name,ep_num,video):
     return
 
 def get_vote_buttons(a,b,c):
-    buttons = InlineKeyboardMarkup(
+    return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(text=f"👍 {a}", callback_data="vote1"),
                 InlineKeyboardButton(text=f"♥️ {b}", callback_data="vote2"),
-                InlineKeyboardButton(text=f"👎 {c}", callback_data="vote3")
+                InlineKeyboardButton(text=f"👎 {c}", callback_data="vote3"),
             ]
         ]
     )
-    return buttons
 
     
 @app.on_callback_query(filters.regex("vote"))
@@ -204,21 +201,21 @@ async def votes_(_,query: CallbackQuery):
             b = 0
         if c == "":
             c = 0
-        
+
         a = int(a)
         b = int(b)
         c = int(c)
 
         if vote == 1:
-            a = a + 1
+            a += 1
             buttons = get_vote_buttons(a,b,c)
             await query.message.edit_reply_markup(reply_markup=buttons)
         elif vote == 2:
-            b = b + 1
+            b += 1
             buttons = get_vote_buttons(a,b,c)
             await query.message.edit_reply_markup(reply_markup=buttons)
         elif vote == 3:
-            c = c + 1
+            c += 1
             buttons = get_vote_buttons(a,b,c)
             await query.message.edit_reply_markup(reply_markup=buttons)
 
