@@ -7,11 +7,10 @@ from pyrogram.types import Message, MessageEntity
 
 def get_duration(file):
     data = cv2.VideoCapture(file)
-  
+
     frames = data.get(cv2.CAP_PROP_FRAME_COUNT)
     fps = int(data.get(cv2.CAP_PROP_FPS))
-    seconds = int(frames / fps)
-    return seconds
+    return int(frames / fps)
 
 
 def get_screenshot(file):
@@ -31,11 +30,7 @@ def get_screenshot(file):
 def get_filesize(file):
     x = os.path.getsize(file)
     x = round(x/(1024*1024))
-    if x > 1024:
-        x = str(round(x/1024,2)) + " GB"
-    else:
-        x = str(x) + " MB"
-
+    x = f"{str(round(x/1024,2))} GB" if x > 1024 else f"{str(x)} MB"
     return x
 
 def get_epnum(name):
@@ -48,17 +43,15 @@ def format_time(time):
     min = floor(time/60)
     sec = round(time-(min*60))
 
-    time = str(min) + ":" + str(sec)
+    time = f"{str(min)}:{str(sec)}"
     return time
 
 def format_text(text):
-    ftext = ""
-    for x in text:
-        if x in ascii_letters or x == " " or x in digits:
-            ftext += x
-        else:
-            ftext += " "
-    
+    ftext = "".join(
+        x if x in ascii_letters or x == " " or x in digits else " "
+        for x in text
+    )
+
     while "  " in ftext:
         ftext = ftext.replace("  "," ")
     return ftext
@@ -86,14 +79,17 @@ async def status_text(text):
 
 {}
 """
-    
-    queue_text = ""
-    for i in queue:
-        queue_text += "📌 " + i["title"].replace(".mkv","").replace(".mp4","").strip() + "\n"
 
-    if queue_text == "":
+    queue_text = "".join(
+        "📌 "
+        + i["title"].replace(".mkv", "").replace(".mp4", "").strip()
+        + "\n"
+        for i in queue
+    )
+
+    if not queue_text:
         queue_text = "❌ Empty"
-        
+
     return stat.format(
         text,
         queue_text
@@ -140,16 +136,16 @@ ETA: {}
             if x > 60:
                 z = floor(x/60)
                 x = x-(z*60)
-                ETA = str(z) + " Hour " + str(x) + " Minute"
+                ETA = f"{str(z)} Hour {str(x)} Minute"
             else:
-                ETA = str(x) + " Minute " + str(y) + " Second"
+                ETA = f"{str(x)} Minute {str(y)} Second"
         else:
-            ETA = str(ETA) + " Second"  
+            ETA = f"{str(ETA)} Second"  
 
         if speed > 1024:
-            speed = str(round(speed/1024)) + " MB"
+            speed = f"{str(round(speed/1024))} MB"
         else:
-            speed = str(speed) + " KB"
+            speed = f"{str(speed)} KB"
 
         completed = round((percent/100)*size)
 
@@ -158,11 +154,7 @@ ETA: {}
         else:
             completed = str(completed) + " MB"
 
-        if size > 1024:
-            size = str(round(size/1024,2)) + " GB"
-        else:
-            size = str(size) + " MB"
-
+        size = str(round(size/1024,2)) + " GB" if size > 1024 else str(size) + " MB"
         fill = "▪️"
         blank = "▫️"
         bar = ""
@@ -190,7 +182,7 @@ ETA: {}
             speed = 0.01
 
         remaining = floor(int(total)-completed)
-        ETA = floor(remaining/float(speed))
+        ETA = floor(remaining / speed)
 
         if ETA > 60:
             x = floor(ETA/60)
@@ -213,7 +205,7 @@ ETA: {}
 
         bar += round(percent/10)*fill
         bar += round(((20 - len(bar))/2))*blank
-        
+
         speed = str(speed) + "x"
 
         text2 = text2.format(

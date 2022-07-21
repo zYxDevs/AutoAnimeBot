@@ -15,25 +15,25 @@ def truncate(text):
     list = text.split(" ")
     text1 = ""
     text2 = ""
-    pos = 0    
+    pos = 0
     for i in list:
-        if len(text1) + len(i) < 16 and pos == 0:        
-            text1 += " " + i
+        if len(text1) + len(i) < 16 and pos == 0:
+            text1 += f" {i}"
         elif len(text2) + len(i) < 16:
-            pos = 1       
-            text2 += " " + i
+            pos = 1
+            text2 += f" {i}"
 
     text1 = text1.strip()
-    text2 = text2.strip()     
+    text2 = text2.strip()
     return text1,text2
 
 err = 0
 
 async def get_cover(id):
     global err
-    
+
     try:
-        url = "https://anilist.co/anime/" + str(id)
+        url = f"https://anilist.co/anime/{str(id)}"
 
         r = requests.get(url).content
         soup = bs(r,"html.parser")
@@ -55,17 +55,15 @@ async def get_cover(id):
         err += 1
         if err != 5:
             return await get_cover(id)
-        else:
-            err = 0
-            return "assets/c4UUTC4DAe.jpg"
+        err = 0
+        return "assets/c4UUTC4DAe.jpg"
 
 def changeImageSize(maxWidth, maxHeight, image):
     widthRatio = maxWidth / image.size[0]
     heightRatio = maxHeight / image.size[1]
     newWidth = int(widthRatio * image.size[0])
     newHeight = int(heightRatio * image.size[1])
-    newImage = image.resize((newWidth, newHeight))
-    return newImage
+    return image.resize((newWidth, newHeight))
 
 async def generate_thumbnail(id,file,title,ep_num,size,dur):
     ss = get_screenshot(file)

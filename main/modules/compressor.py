@@ -13,14 +13,14 @@ async def gg():
 async def compress_video(total_time, message, name):
   try:
     video = "video.mkv"
-    out = "out.mkv" 
+    out = "out.mkv"
     prog = "progressaa.txt"
 
     with open(prog, 'w') as f:
       pass
-    
+
     asyncio.create_task(gg())
-   
+
     while True:
       with open(prog, 'r+') as file:
         text = file.read()
@@ -29,24 +29,14 @@ async def compress_video(total_time, message, name):
         progress=re.findall("progress=(\w+)", text)
         speed=re.findall("speed=(\d+\.?\d*)", text)
 
-        if len(frame):
-          frame = int(frame[-1])
-        else:
-          frame = 1
-        if len(speed):
-          speed = speed[-1]
-        else:
-          speed = 1
-        if len(time_in_us):
-          time_in_us = time_in_us[-1]
-        else:
-          time_in_us = 1
-        if len(progress):
-          if progress[-1] == "end":
-            break
-        
+        frame = int(frame[-1]) if len(frame) else 1
+        speed = speed[-1] if len(speed) else 1
+        time_in_us = time_in_us[-1] if len(time_in_us) else 1
+        if len(progress) and progress[-1] == "end":
+          break
+
         time_done = math.floor(int(time_in_us)/1000000)
-        
+
         progress_str = get_progress_text(name,"Encoding",time_done,str(speed),total_time,enco=True)
         try:
           await message.edit(progress_str)
@@ -54,9 +44,6 @@ async def compress_video(total_time, message, name):
             pass
       await asyncio.sleep(20)
 
-    if os.path.lexists(out):
-        return out
-    else:
-        return "None"
+    return out if os.path.lexists(out) else "None"
   except Exception as e:
     print("Encoder Error",e)
